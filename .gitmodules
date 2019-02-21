@@ -1,0 +1,3 @@
+[submodule "icon-sdk-cpp"]
+	path = icon-sdk-cpp
+	url = https://github.com/iconation/icon-sdk-cpp
