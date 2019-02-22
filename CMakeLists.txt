@@ -41,12 +41,16 @@ if (MSVC)
     set (CMAKE_CXX_FLAGS_DEBUG "/std:c++17 /MDd /Od /Zi")
 else ()
     # Assume g++
-    set (CMAKE_CXX_FLAGS_RELEASE "-std=c++17 -O2")
-    set (CMAKE_CXX_FLAGS_DEBUG "-std=c++17 -g")
+    set (CMAKE_CXX_FLAGS_RELEASE "-std=c++17 -O2 -pthread")
+    set (CMAKE_CXX_FLAGS_DEBUG "-std=c++17 -g -pthread")
 endif (MSVC)
 
 # --- Librairies definition
 set (MYSQL_LIBRARIES mysqlcppconn8)
+if (MSVC)
+else ()
+    set (FILESYSTEM_LIBRARIES stdc++fs)
+endif (MSVC)
 
 # === Aegis =======================================================================================================
 
@@ -71,6 +75,6 @@ file (GLOB_RECURSE AEGIS_SRC
 add_executable (Aegis ${AEGIS_SRC})
 target_include_directories (Aegis PRIVATE ${AEGIS_SRCDIR})
 target_include_directories (Aegis PRIVATE ${COMMON_SRCDIR})
-target_link_libraries (Aegis SDK_lib common_lib ${MYSQL_LIBRARIES})
+target_link_libraries (Aegis SDK_lib common_lib ${MYSQL_LIBRARIES} ${FILESYSTEM_LIBRARIES})
 set_target_properties(Aegis PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 set_target_properties(Aegis PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

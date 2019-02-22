@@ -2,9 +2,7 @@
 #include "sdk/sdk.h"
 #include "threadpool/threadpool.h"
 #include "common/dbg/dbg.h"
-#include <optional>
 #include <chrono>
-#include <thread>
 #include <iostream>
 
 using namespace ICONation::SDK::Blockchain;
@@ -19,14 +17,16 @@ namespace ICONation::BlockDownloader
 
     Block Client::get_block (const Block::Height &height)
     {
-        std::optional<Block> result;
+        Block result;
+        bool wait = true;
 
-        while (!result.has_value())
+        while (wait)
         {
             // Protect m_cache
             m_mutex.lock();
             if (m_cache.find (height) != m_cache.end()) {
-                result.emplace (m_cache[height]);
+                result = m_cache[height];
+                wait = false;
             }
             m_mutex.unlock();
 
@@ -34,7 +34,7 @@ namespace ICONation::BlockDownloader
             std::this_thread::sleep_for (std::chrono::milliseconds (1));
         }
 
-        return result.value();
+        return result;
     }
 
     void Client::start_download (Block::Height current, Block::Height target)

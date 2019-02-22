@@ -3,6 +3,7 @@
 #include "blockchain/block.h"
 #include <map>
 #include <mutex>
+#include <thread>
 
 namespace ICONation::BlockDownloader
 {
