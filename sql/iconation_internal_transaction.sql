@@ -40,7 +40,7 @@ CREATE TABLE `internal_transaction` (
   CONSTRAINT `internal_tx_from` FOREIGN KEY (`from`) REFERENCES `account` (`hash`),
   CONSTRAINT `internal_tx_to` FOREIGN KEY (`to`) REFERENCES `account` (`hash`),
   CONSTRAINT `internal_tx_transaction` FOREIGN KEY (`transaction`) REFERENCES `transaction` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57933 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -52,4 +52,4 @@ CREATE TABLE `internal_transaction` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-16 23:40:15
+-- Dump completed on 2019-04-17  1:47:21

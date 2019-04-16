@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `transaction_message`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `transaction_message` (
   `transaction` int(11) NOT NULL,
-  `data` blob NOT NULL,
+  `data` text NOT NULL,
   PRIMARY KEY (`transaction`),
   UNIQUE KEY `transaction_UNIQUE` (`transaction`),
   CONSTRAINT `transaction_message_transaction` FOREIGN KEY (`transaction`) REFERENCES `transaction` (`id`)
@@ -40,4 +40,4 @@ CREATE TABLE `transaction_message` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-16 23:40:16
+-- Dump completed on 2019-04-17  1:47:22
