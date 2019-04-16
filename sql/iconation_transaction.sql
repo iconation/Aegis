@@ -41,7 +41,7 @@ CREATE TABLE `transaction` (
   CONSTRAINT `transaction_block_id` FOREIGN KEY (`block`) REFERENCES `block` (`id`),
   CONSTRAINT `transaction_from_hash` FOREIGN KEY (`from`) REFERENCES `account` (`hash`),
   CONSTRAINT `transaction_to_hash` FOREIGN KEY (`to`) REFERENCES `account` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=775182 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=776200 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -53,4 +53,4 @@ CREATE TABLE `transaction` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-17  1:47:21
+-- Dump completed on 2019-04-17  1:57:01

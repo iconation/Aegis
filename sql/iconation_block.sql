@@ -34,7 +34,7 @@ CREATE TABLE `block` (
   UNIQUE KEY `previous_block_hash_UNIQUE` (`previous_block`),
   KEY `prev_hash_id_idx` (`previous_block`),
   CONSTRAINT `block_previous_block` FOREIGN KEY (`previous_block`) REFERENCES `block` (`hash`)
-) ENGINE=InnoDB AUTO_INCREMENT=738698 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=739760 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -46,4 +46,4 @@ CREATE TABLE `block` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-17  1:47:22
+-- Dump completed on 2019-04-17  1:57:02
