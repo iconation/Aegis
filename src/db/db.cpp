@@ -226,7 +226,6 @@ namespace ICONation::Aegis::Db
         return row[0].get<Id>();
     }
 
-
     Db::Id Db::transaction_insert (const Transaction &transaction, const Id &parentBlock)
     {
         // Make sure the destination account has been created
@@ -261,11 +260,11 @@ namespace ICONation::Aegis::Db
     }
 
     // === Internal Transaction =================================================================================
-    void Db::transaction_message_insert (const std::vector<unsigned char> &message, const Id &parentTransaction)
+    void Db::transaction_message_insert (const std::string &message, const Id &parentTransaction)
     {
         m_sql->schema()->getTable ("transaction_message")
             .insert ("transaction", "data")
-            .values (parentTransaction, std::string(message.begin(), message.end()))
+            .values (parentTransaction, message)
             .execute();
     }
     

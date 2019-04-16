@@ -43,7 +43,7 @@ namespace ICONation::Aegis::Db
             
         // Transaction message
         public:
-            void transaction_message_insert (const std::vector<unsigned char> &message, const Id &parentTransaction);
+            void transaction_message_insert (const std::string &message, const Id &parentTransaction);
 
         // Block
         public:
