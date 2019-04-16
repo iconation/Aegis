@@ -71,10 +71,26 @@ file (GLOB_RECURSE AEGIS_SRC
     ${AEGIS_SRCDIR}/*.cpp     ${AEGIS_SRCDIR}/*.h
 )
 
-# Aegis executable
+# --- Tests source code
+file (GLOB_RECURSE AEGIS_TESTS_SRC
+    ${AEGIS_TESTDIR}/main.cpp
+)
+
+# --- Aegis Library
+add_library (Aegis_lib STATIC ${AEGIS_SRC})
+target_include_directories (Aegis_lib PRIVATE ${AEGIS_SRCDIR})
+target_link_libraries (Aegis_lib SDK_lib common_lib ${MYSQL_LIBRARIES} ${FILESYSTEM_LIBRARIES})
+
+# --- Aegis executable
 add_executable (Aegis ${AEGIS_SRC})
 target_include_directories (Aegis PRIVATE ${AEGIS_SRCDIR})
-target_include_directories (Aegis PRIVATE ${COMMON_SRCDIR})
 target_link_libraries (Aegis SDK_lib common_lib ${MYSQL_LIBRARIES} ${FILESYSTEM_LIBRARIES})
 set_target_properties(Aegis PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 set_target_properties(Aegis PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+# --- Aegis Tests executable
+add_executable (Aegis_Tests ${AEGIS_TESTS_SRC})
+target_include_directories (Aegis_Tests PRIVATE ${AEGIS_SRCDIR})
+target_link_libraries(Aegis_Tests Aegis_lib common_lib ${GTEST_LIBRARIES} ${PTHREAD_LIBRARIES} ${MYSQL_LIBRARIES})
+set_target_properties(Aegis_Tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+set_target_properties(Aegis_Tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

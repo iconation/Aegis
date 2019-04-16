@@ -8,20 +8,29 @@ using namespace mysqlx;
 
 namespace ICONation::Aegis::Db
 {
-    Db::Db (void)
+    Db::Db (const std::string &host, const int port, const std::string &user, const std::string &password, const std::string &schema)
     {
-        m_sql = std::make_unique<SQL> (
-           DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER, DEFAULT_PASSWORD, DEFAULT_SCHEMA);
+        m_sql = std::make_unique<SQL> (host, port, user, password, schema);
     }
 
     static void reset_table (std::unique_ptr<SQL> &sql, const std::string &table)
     {
     }
 
-    void Db::clear (void)
+    void Db::disable_foreign_checks (void)
     {
         m_sql->session()->sql ("SET FOREIGN_KEY_CHECKS=0;").execute();
-        m_sql->session()->sql (fmt::format ("USE {};", DEFAULT_SCHEMA)).execute();
+    }
+
+    void Db::enable_foreign_checks (void)
+    {
+        m_sql->session()->sql ("SET FOREIGN_KEY_CHECKS=1;").execute();
+    }
+
+    void Db::clear (const std::string &schema)
+    {
+        disable_foreign_checks();
+        m_sql->session()->sql (fmt::format ("USE {};", schema)).execute();
 
         // Clear all these tables
         std::vector<std::string> tables = {
@@ -31,7 +40,8 @@ namespace ICONation::Aegis::Db
             "icx", 
             "internal_transaction", 
             "irc2", 
-            "transaction"
+            "transaction",
+            "transaction_message"
         };
 
         std::for_each (tables.begin(), tables.end(), [this] (const std::string &table) {
@@ -39,7 +49,7 @@ namespace ICONation::Aegis::Db
             m_sql->session()->sql (fmt::format ("ALTER TABLE {} AUTO_INCREMENT = 1;", table)).execute();
         });
 
-        m_sql->session()->sql ("SET FOREIGN_KEY_CHECKS=1;").execute();
+        enable_foreign_checks();
     }
 
     void Db::start_transaction (void)
@@ -59,12 +69,12 @@ namespace ICONation::Aegis::Db
 
     bool Db::need_bootstrap (void)
     {
-        return m_sql->schema()->getTable("block").select("id").execute().count() == 0;
+        return m_sql->schema()->getTable("icx").select("id").execute().count() == 0;
     }
 
     void Db::bootstrap (const ICX &icx)
     {
-        m_sql->session()->sql ("SET FOREIGN_KEY_CHECKS=0;").execute();
+        disable_foreign_checks();
 
         // Insert native ICX token
         m_sql->schema()->getTable ("icx")
@@ -72,7 +82,7 @@ namespace ICONation::Aegis::Db
             .values (icx.name(), icx.symbol(), icx.totalSupply().get_str(), icx.decimals())
             .execute();
 
-        m_sql->session()->sql ("SET FOREIGN_KEY_CHECKS=1;").execute();
+        enable_foreign_checks();
     }
 
     // === Account =================================================================================
@@ -200,6 +210,23 @@ namespace ICONation::Aegis::Db
     }
 
     // === Transaction =================================================================================
+    Db::Id Db::transaction_id (const Transaction &transaction, const Id &parentBlock)
+    {
+        Row row = m_sql->schema()->getTable ("transaction")
+            .select ("id")
+            .where ("hash = :hash")
+            .bind ("hash", transaction.hash().repr())
+            .execute().fetchOne();
+        
+        if (row.isNull()) {
+            // Create a new account
+            return transaction_insert (transaction, parentBlock);
+        }
+
+        return row[0].get<Id>();
+    }
+
+
     Db::Id Db::transaction_insert (const Transaction &transaction, const Id &parentBlock)
     {
         // Make sure the destination account has been created
@@ -225,7 +252,21 @@ namespace ICONation::Aegis::Db
             internal_transaction_insert (internalTx, transactionId);
         }
 
+        // Insert transaction message
+        if (transaction.message().size() != 0) {
+            transaction_message_insert (transaction.message(), transactionId);
+        }
+
         return transactionId;
+    }
+
+    // === Internal Transaction =================================================================================
+    void Db::transaction_message_insert (const std::vector<unsigned char> &message, const Id &parentTransaction)
+    {
+        m_sql->schema()->getTable ("transaction_message")
+            .insert ("transaction", "data")
+            .values (parentTransaction, std::string(message.begin(), message.end()))
+            .execute();
     }
     
     // === Internal Transaction =================================================================================
@@ -319,9 +360,9 @@ namespace ICONation::Aegis::Db
     {
         // Genesis block doesn't respect the previous block hash definition
         // Disable the foreign key checks temporarly before inserting
-        m_sql->session()->sql ("SET FOREIGN_KEY_CHECKS=0;").execute();
+        disable_foreign_checks();
         Id blockId = block_insert_query (genesis);
-        m_sql->session()->sql ("SET FOREIGN_KEY_CHECKS=1;").execute();
+        enable_foreign_checks();
 
         // Insert transaction inside the block
         for (const auto &account : genesis.accounts()) {

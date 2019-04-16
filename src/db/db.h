@@ -11,16 +11,18 @@ namespace ICONation::Aegis::Db
         // Db specific types
         public:
             typedef uint64_t Id;
-            
+
         public:
-            Db (void);
+            Db (const std::string &host=DEFAULT_HOST, const int port=DEFAULT_PORT, 
+                const std::string &user=DEFAULT_USER, const std::string &password=DEFAULT_PASSWORD, 
+                const std::string &schema=DEFAULT_SCHEMA);
             ~Db (void) = default;
 
         // States
         public:
             bool need_bootstrap (void);
             void bootstrap (const SDK::Blockchain::ICX &icx);
-            void clear (void);
+            void clear (const std::string &schema=DEFAULT_SCHEMA);
             void start_transaction (void);
             void commit (void);
             void rollback (void);
@@ -32,11 +34,16 @@ namespace ICONation::Aegis::Db
             
         // Transaction
         public:
+            Id transaction_id (const SDK::Blockchain::Transaction &transaction, const Id &parentBlock);
             Id transaction_insert (const SDK::Blockchain::Transaction &transaction, const Id &parentBlock);
             
         // Internal Transaction
         public:
             Id internal_transaction_insert (const SDK::Blockchain::InternalTransaction &internalTransaction, const Id &parentTransaction);
+            
+        // Transaction message
+        public:
+            void transaction_message_insert (const std::vector<unsigned char> &message, const Id &parentTransaction);
 
         // Block
         public:
@@ -59,6 +66,11 @@ namespace ICONation::Aegis::Db
             Id token_irc2_id (const SDK::Blockchain::IRC2 &irc2);
             Id token_icx_id (const SDK::Blockchain::ICX &icx);
             Id token_id (const SDK::Blockchain::Token &token);
+        
+        // State
+        public:
+            void enable_foreign_checks (void);
+            void disable_foreign_checks (void);
 
         // Meta
         public:
