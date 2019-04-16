@@ -24,11 +24,23 @@ namespace ICONation::SDK::Tests
     const std::string TEST_SCHEMA = "iconation_test";
 
     Db::Db db (TEST_HOST, TEST_PORT, TEST_USER, TEST_PASSWORD, TEST_SCHEMA);
-    SDK::Client client ("http://iconation.team:9000/api/v3", EULJIRO);
+    SDK::Client testnet ("http://iconation.team:9000/api/v3", EULJIRO);
+    SDK::Client mainnet ("http://iconation.team:9100/api/v3", MAINNET);
 
     TEST (Db, InsertTransactionMessage)
     {
-        Block block = client.get_block_by_height (56189);
+        Block block;
+
+        // Weird case
+        db.clear();
+        block = mainnet.get_block_by_height (58520);
+        db.disable_foreign_checks();
+        db.block_insert (block);
+        db.enable_foreign_checks();
+
+        // Normal case
+        db.clear();
+        block = testnet.get_block_by_height (56189);
         db.disable_foreign_checks();
         db.block_insert (block);
         db.enable_foreign_checks();
@@ -38,13 +50,13 @@ namespace ICONation::SDK::Tests
 int main (int argc, char **argv)
 {
     using ICONation::SDK::Tests::db;
-    using ICONation::SDK::Tests::client;
+    using ICONation::SDK::Tests::testnet;
     using ICONation::SDK::Tests::TEST_SCHEMA;
  
     try {
         Dbg::warn ("Preparing tests...");
         db.clear (TEST_SCHEMA);
-        ICX::Loop icxSupply = client.get_total_supply();
+        ICX::Loop icxSupply = testnet.get_total_supply();
         db.bootstrap (ICX ("ICX", "ICX", icxSupply, 18));
 
         testing::InitGoogleTest (&argc, argv);
