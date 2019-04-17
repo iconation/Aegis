@@ -3,7 +3,7 @@ import md5
 
 db = mysql.connector.connect (host="localhost", user="icon", passwd="icon", database="iconation", auth_plugin="mysql_native_password")
 cursor = db.cursor()
-cursor.execute (open("show_transaction_message_images.sql", "rb").read())
+cursor.execute (open("transaction_message_images.sql", "rb").read())
 
 html = "<html><body>"
 
