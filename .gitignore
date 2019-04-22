@@ -2,3 +2,4 @@ build/
 release/
 *.code-workspace
 .vscode
+sql/scripts/images.html

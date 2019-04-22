@@ -9,7 +9,7 @@ html = "<html><body>"
 
 for result in cursor.fetchall():
     txid, url, data = result
-    html += '<img width="200px" height="200px" src="' + data[2:].decode("hex") + '">'
+    html += '<a href="' + url + '"><img width="200px" height="200px" src="' + data[2:].decode("hex") + '"></a>'
 
 html += "</body></html>"
 
