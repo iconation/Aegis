@@ -87,7 +87,7 @@ namespace ICONation::Aegis
             Block newBlock = m_downloader->get_block (newBlockHeight);
 
             // Insert it in database
-            Common::Dbg::info ("Inserting block height {} into database...", newBlock.height());
+            Common::Dbg::info ("Inserting block height {} / {} into database...", newBlock.height(), lastRemoteBlock.height());
             m_db.start_transaction();
             m_db.block_insert (newBlock);
             m_db.commit();
