@@ -1,5 +1,4 @@
 import mysql.connector # pip install mysql-connector-python
-import md5
 
 db = mysql.connector.connect (host="localhost", user="icon", passwd="icon", database="iconation", auth_plugin="mysql_native_password")
 cursor = db.cursor()
