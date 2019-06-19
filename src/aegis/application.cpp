@@ -62,38 +62,67 @@ namespace ICONation::Aegis
         }
     }
 
+    void Application::insert_cache (std::list<Block> &cache)
+    {
+        Common::Dbg::info ("Inserting block height {} to {} into database...", 
+            cache.front().height(), cache.back().height());
+
+        // Insert everything
+        m_db.start_transaction();
+        for (auto &block : cache) {
+            m_db.block_insert (block);
+        }
+        m_db.commit();
+
+        cache.clear();
+    }
+
     int Application::main (void)
     {
-        // Clearing for tests
-        // warn ("Cleaning database...");
-        // m_db.clear();
-
         // Bootstrap
         check_bootstrap();
 
-        // Get latest block
-        Block lastRemoteBlock = m_client->get_last_block();
-        Block lastLocalBlock = m_db.block_get (m_db.last_block_id());
-
-        // Start downloading blocks
-        m_downloader->start_download (lastLocalBlock.height() + 1, lastRemoteBlock.height());
-
-        while (lastLocalBlock.height() < lastRemoteBlock.height())
+        while (true)
         {
-            // Get the next block height
-            Block::Height newBlockHeight = lastLocalBlock.height() + 1;
+            // Get latest block
+            Block lastRemoteBlock = m_client->get_last_block();
+            Block lastLocalBlock = m_db.block_get (m_db.last_block_id());
 
-            // Get the next block from cache
-            Block newBlock = m_downloader->get_block (newBlockHeight);
+            if (lastRemoteBlock.height() == lastLocalBlock.height()) {
+                break;
+            }
 
-            // Insert it in database
-            Common::Dbg::info ("Inserting block height {} / {} into database...", newBlock.height(), lastRemoteBlock.height());
-            m_db.start_transaction();
-            m_db.block_insert (newBlock);
-            m_db.commit();
+            Common::Dbg::info ("Current height : {} | Remote height : {}", lastLocalBlock.height(), lastRemoteBlock.height());
 
-            // Update to the next block
-            lastLocalBlock = newBlock;
+            // Start downloading blocks
+            m_downloader->start_download (lastLocalBlock.height() + 1, lastRemoteBlock.height());
+
+            // Block cache for bulk insertion
+            std::list<Block> cache;
+
+            while (lastLocalBlock.height() < lastRemoteBlock.height())
+            {
+                // Get the next block height
+                Block::Height newBlockHeight = lastLocalBlock.height() + 1;
+
+                // Get the next block from cache
+                Block newBlock = m_downloader->get_block (newBlockHeight);
+
+                // Insert it in cache
+                cache.emplace_back(newBlock);
+
+                if (cache.size() > 200) {
+                    insert_cache (cache);
+                }
+
+                // Update to the next block
+                lastLocalBlock = newBlock;
+            }
+
+            // Insert remaining items
+            insert_cache (cache);
+            
+            
         }
 
         m_downloader->stop();

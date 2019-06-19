@@ -37,6 +37,8 @@ namespace ICONation::Aegis
             std::string m_endpoint;
 
         // Database
+        public:
+            void insert_cache (std::list<SDK::Blockchain::Block> &cache);
         private:
             Db::Db m_db;
     };

@@ -51,10 +51,12 @@ namespace ICONation::BlockDownloader
     {
         const std::string endpoint = m_endpoint;
         m_running = true;
+        Block::Height lastBlockDownloaded = current;
 
         // Download the whole gap
-        while (m_running && current <= target)
+        while (m_running && lastBlockDownloaded <= target)
         {
+            current = lastBlockDownloaded;
             progschj::ThreadPool blockPool (m_threads);
             std::vector<std::future<Block>> blocks;
 
@@ -85,11 +87,22 @@ namespace ICONation::BlockDownloader
             // Put the results in cache
             for (auto &&result : blocks)
             {
-                Block block = result.get();
-                // Protect m_cache
-                m_mutex.lock();
-                m_cache [block.height()] = block;
-                m_mutex.unlock();
+                try {
+                    Block block = result.get();
+
+                    // Protect m_cache
+                    m_mutex.lock();
+                    m_cache [block.height()] = block;
+                    m_mutex.unlock();
+                    lastBlockDownloaded = block.height();
+
+                } catch (std::exception &e) {
+                    Common::Dbg::error ("Application exception :");
+                    Common::Dbg::error ("    - Type   : {}", typeid(e).name());
+                    Common::Dbg::error ("    - Reason : {}", e.what());
+                    Common::Dbg::warn ("Retrying to insert block in cache {} ...", lastBlockDownloaded);
+                    break;
+                }
             }
         }
 
