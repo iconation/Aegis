@@ -11,11 +11,12 @@ namespace ICONation::Aegis
     :   Common::Application::Application (argc, argv)
     {
         // Arg 1 (optional) : ICON endpoint URL
+        m_endpoint = (argc > 1) ? argv[1] : "https://ctz.solidwallet.io/api/v3";
         // m_endpoint = (argc > 1) ? argv[1] : "https://bicon.net.solidwallet.io/api/v3";
-        // m_endpoint = (argc > 1) ? argv[1] : "https://ctz.solidwallet.io/api/v3";
-        m_endpoint = (argc > 1) ? argv[1] : "http://iconation.team:9100/api/v3";
+        // m_endpoint = (argc > 1) ? argv[1] : "http://iconation.team:9100/api/v3";
         // Arg 2 (optional) : Number of threads
         int threads = (argc > 2) ? atoi (argv[2]) : 5;
+        m_cacheSize = (argc > 3) ? atoi (argv[3]) : 50;
 
         // Create client
         m_client = std::make_unique<SDK::Client> (m_endpoint);
@@ -37,8 +38,8 @@ namespace ICONation::Aegis
     void Application::print_usage (void)
     {
         info ("==========================================");
-        info ("  Usage : {} [endpoint] [number of threads]", m_binary_name);
-        info (" Exemple : {} http://iconation.team:9100/api/v3 5", m_binary_name);
+        info ("  Usage : {} [endpoint] [number of threads] [cache size]", m_binary_name);
+        info (" Exemple : {} https://ctz.solidwallet.io/api/v3 5 50", m_binary_name);
         info ("==========================================");
     }
 
@@ -111,7 +112,7 @@ namespace ICONation::Aegis
                 // Insert it in cache
                 cache.emplace_back(newBlock);
 
-                if (cache.size() > 200) {
+                if (cache.size() > m_cacheSize) {
                     insert_cache (cache);
                 }
 
@@ -121,8 +122,6 @@ namespace ICONation::Aegis
 
             // Insert remaining items
             insert_cache (cache);
-            
-            
         }
 
         m_downloader->stop();

@@ -40,6 +40,7 @@ namespace ICONation::Aegis
         public:
             void insert_cache (std::list<SDK::Blockchain::Block> &cache);
         private:
+            int m_cacheSize;
             Db::Db m_db;
     };
 }
