@@ -38,6 +38,7 @@ namespace ICONation::Aegis
     void Application::print_usage (void)
     {
         info ("==========================================");
+        info ("  +++ Aegis v1.1 +++++++++++++");
         info ("  Usage : {} [endpoint] [number of threads] [cache size]", m_binary_name);
         info (" Exemple : {} https://ctz.solidwallet.io/api/v3 5 50", m_binary_name);
         info ("==========================================");
