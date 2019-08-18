@@ -23,6 +23,11 @@ namespace ICONation::Aegis
 
         // Create block downloader
         m_downloader = std::make_unique<BlockDownloader::Client> (threads, m_endpoint);
+
+        Common::Dbg::info ("Launching Aegis with the following parameters :");
+        Common::Dbg::info ("  Endpoint : {}", m_endpoint);
+        Common::Dbg::info ("  Threads : {}", threads);
+        Common::Dbg::info ("  Cache Size : {}", m_cacheSize);
     }
 
     Application::~Application (void)
