@@ -44,7 +44,7 @@ Application::~Application(void)
 void Application::print_usage(void)
 {
     info("==========================================");
-    info("  +++ Aegis v%s +++++++++++++", APP_VERSION);
+    info("  +++ Aegis v{} +++++++++++++", APP_VERSION);
     info("  Usage : {} [endpoint] [number of threads] [cache size]", m_binary_name);
     info(" Exemple : {} https://ctz.solidwallet.io/api/v3 5 50", m_binary_name);
     info("==========================================");
