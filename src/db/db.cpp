@@ -13,10 +13,6 @@ Db::Db(const std::string &host, const int port, const std::string &user, const s
     m_sql = std::make_unique<SQL>(host, port, user, password, schema);
 }
 
-static void reset_table(std::unique_ptr<SQL> &sql, const std::string &table)
-{
-}
-
 void Db::disable_foreign_checks(void)
 {
     m_sql->session()->sql("SET FOREIGN_KEY_CHECKS=0;").execute();

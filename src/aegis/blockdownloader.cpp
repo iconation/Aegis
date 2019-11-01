@@ -75,7 +75,7 @@ void Client::download(Block::Height current, Block::Height target)
                         }
                         catch (std::exception &e)
                         {
-                            Common::Dbg::error("Application exception :");
+                            Common::Dbg::error("Downloader exception :");
                             Common::Dbg::error("    - Type   : {}", typeid(e).name());
                             Common::Dbg::error("    - Reason : {}", e.what());
                             Common::Dbg::warn("Retrying to download block {} ...", current);
@@ -103,7 +103,7 @@ void Client::download(Block::Height current, Block::Height target)
             }
             catch (std::exception &e)
             {
-                Common::Dbg::error("Application exception :");
+                Common::Dbg::error("Downloader exception :");
                 Common::Dbg::error("    - Type   : {}", typeid(e).name());
                 Common::Dbg::error("    - Reason : {}", e.what());
                 Common::Dbg::warn("Retrying to insert block in cache {} ...", lastBlockDownloaded);
